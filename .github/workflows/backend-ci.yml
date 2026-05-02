@@ -41,6 +41,11 @@ jobs:
         working-directory: backend
         run: npm ci
 
+      - name: Lint backend
+        working-directory: backend
+        run: |
+          npm run lint || true
+
       - name: Wait for Postgres
         run: |
           for i in {1..15}; do
@@ -54,16 +59,37 @@ jobs:
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
 
-      - name: Run tests
+      - name: Run tests with coverage
         working-directory: backend
-        run: npm test
-        env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
+        run: |
+          npm test -- --coverage
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage/
+
+      - name: Build Docker image for backend
+        working-directory: backend
+        run: |
+          docker build -t backend:ci .
+
+      - name: Save Docker image to tar
+        working-directory: backend
+        run: |
+          docker save backend:ci -o backend-image.tar
+
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-image
+          path: backend/backend-image.tar
 
   deploy:
     needs: test-and-migrate
     runs-on: ubuntu-latest
-    # Deploy csak manuálisan indítható az Actions UI-ból
+    # Deployment can only be triggered manually from the Actions UI. It can be switched to automatic later if the deploy environment secrets are available.
     if: ${{ github.event_name == 'workflow_dispatch' }}
     env:
       PROD_DB: ${{ secrets.PROD_DB }}
