@@ -44,7 +44,7 @@ jobs:
       - name: Lint backend
         working-directory: backend
         run: |
-          npm run lint || true
+          npx eslint .
 
       - name: Wait for Postgres
         run: |
