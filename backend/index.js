@@ -1,7 +1,6 @@
 // backend/index.js
 const express = require('express');
-const sequelize = require('./db');
-const Entry = require('./models/entry');
+const { sequelize, Entry } = require('./models');
 
 const app = express();
 app.use(express.json());
@@ -27,12 +26,17 @@ const PORT = process.env.PORT || 3000;
 
 async function startServer() {
   await sequelize.authenticate();
-  await sequelize.sync();
+
+  if (process.env.NODE_ENV !== 'production') {
+    await sequelize.sync();
+  } else {
+    console.log('Production mode: skipping sequelize.sync(); run migrations instead.');
+  }
+
   const server = app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
   return server;
 }
 
-// ha közvetlenül futtatják: indítsd el és exportáld a server objektumot
 if (require.main === module) {
   startServer().catch(err => {
     console.error('Failed to start server', err);
@@ -40,5 +44,4 @@ if (require.main === module) {
   });
 }
 
-// exportáljuk az app-et tesztekhez; ha valaki explicit kéri, exportálhatjuk a startServer-t is
 module.exports = { app, startServer, sequelize };

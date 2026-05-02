@@ -1,12 +1,21 @@
-// backend/models/index.js
-const sequelize = require('../db'); // ugyanaz az instance, amit index.js is használ
+// backend/models/index.js (ellenőrzés)
+const fs = require('fs');
+const path = require('path');
 const Sequelize = require('sequelize');
+const sequelize = require('../db'); // vagy a te db.js exportja
 
-// importáld a model fájlt (ami a te projektedben már a sequelize-t használja)
-const Entry = require('./entry');
+const db = {};
+fs.readdirSync(__dirname)
+  .filter(file => file !== 'index.js' && file.slice(-3) === '.js')
+  .forEach(file => {
+    const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
+    db[model.name] = model;
+  });
 
-module.exports = {
-  sequelize,
-  Sequelize,
-  Entry
-};
+Object.keys(db).forEach(name => {
+  if (db[name].associate) db[name].associate(db);
+});
+
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
+module.exports = db;
