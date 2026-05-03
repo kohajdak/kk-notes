@@ -5,3 +5,4 @@ dist/
 .vscode/
 coverage/
 db-data/
+backend/backend-image.tar
