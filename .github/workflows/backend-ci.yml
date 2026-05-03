@@ -49,17 +49,30 @@ jobs:
         run: docker ps -a
 
       - name: Wait for Postgres
-        run: sleep 5
+        run: |
+          for i in {1..60}; do
+            if pg_isready -h localhost -p 5432 -U app; then
+              echo "Postgres is ready!"
+              exit 0
+            fi
+            echo "Waiting for Postgres... ($i/10)"
+            sleep 5
+          done
+          echo "Postgres did not become ready in time."
+          exit 1
 
       - name: Run migrations
         working-directory: backend
-        run: npx sequelize-cli db:migrate
         env:
           DATABASE_URL: ${{ env.DATABASE_URL }}
           PGPASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+        run: npx sequelize-cli db:migrate
 
       - name: Run tests with coverage
         working-directory: backend
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          PGPASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
         run: npm test -- --coverage
 
       - name: Upload coverage report
