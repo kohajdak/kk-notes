@@ -64,14 +64,14 @@ jobs:
       - name: Run migrations
         working-directory: backend
         env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
+          DATABASE_URL: postgres://app:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/notes_test
           PGPASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
-        run: npx sequelize-cli db:migrate
+        run: npx sequelize-cli db:migrate --env test --url "$DATABASE_URL"
 
       - name: Run tests with coverage
         working-directory: backend
         env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
+          DATABASE_URL: postgres://app:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/notes_test
           PGPASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
         run: npm test -- --coverage
 
