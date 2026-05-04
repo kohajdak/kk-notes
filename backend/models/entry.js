@@ -25,12 +25,16 @@ module.exports = (sequelize, DataTypes) => {
     tags: {
       type: DataTypes.STRING,
       allowNull: true
+    },
+    backgroundColor: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: '#FFE082'
     }
   }, {
     sequelize,
     modelName: 'Entry',
-    tableName: 'entries',
-    underscored: true,
+    tableName: 'Entries',
     timestamps: true
   });
 

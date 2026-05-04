@@ -1,25 +1,40 @@
 // backend/index.js
 const express = require('express');
+const cors = require('cors');
+const { Op } = require('sequelize');
 const { sequelize, Entry } = require('./models');
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 // routes
 app.get('/api/entries', async (req, res) => {
-  const { q, tag } = req.query;
-  const where = {};
-  if (tag) where.tags = tag;
-  if (q) where.body = { [require('sequelize').Op.iLike]: `%${q}%` };
-  const entries = await Entry.findAll({ where, order: [['created_at', 'DESC']] });
-  res.json(entries);
+  try {
+    const { q, tag } = req.query;
+    const where = {};
+    if (tag) where.tags = tag;
+    if (q && q.trim()) {
+      where.body = { [Op.iLike]: `%${q}%` };
+    }
+    const entries = await Entry.findAll({ where, order: [['createdAt', 'DESC']] });
+    res.json(entries);
+  } catch (err) {
+    console.error('Error fetching entries:', err);
+    res.status(500).json({ error: 'Failed to fetch entries', details: err.message });
+  }
 });
 
 app.post('/api/entries', async (req, res) => {
-  const { title, body, tags } = req.body;
-  if (!body) return res.status(400).json({ error: 'body is required' });
-  const entry = await Entry.create({ title, body, tags });
-  res.status(201).json(entry);
+  try {
+    const { body, tags, backgroundColor } = req.body;
+    if (!body) return res.status(400).json({ error: 'body is required' });
+    const entry = await Entry.create({ body, tags, backgroundColor: backgroundColor || '#FFE082' });
+    res.status(201).json(entry);
+  } catch (err) {
+    console.error('Error creating entry:', err);
+    res.status(500).json({ error: 'Failed to create entry', details: err.message });
+  }
 });
 
 const PORT = process.env.PORT || 3000;
@@ -28,7 +43,9 @@ async function startServer() {
   await sequelize.authenticate();
 
   if (process.env.NODE_ENV !== 'production') {
-    await sequelize.sync();
+    await sequelize.sync({ alter: true });
+  } else if (process.env.SKIP_DB_SYNC !== 'true') {
+    await sequelize.sync({ alter: true });
   } else {
     console.log('Production mode: skipping sequelize.sync(); run migrations instead.');
   }
