@@ -199,19 +199,63 @@ curl -X POST http://localhost:3000/api/entries \
 
 ---
 
-## Future Endpoints (Planned)
+## Update Entry (PUT)
+Update an existing journal entry by ID.
 
-### 3. Update Entry (PUT)
+### Request
 ```
 PUT /api/entries/:id
 ```
 
-### 4. Delete Entry (DELETE)
+### Request Body
+```json
+{
+  "body": "string (required)",
+  "tags": "string (optional, comma-separated)",
+  "backgroundColor": "string (optional, hex color)"
+}
+```
+
+### Response
+**Status**: `200 OK`
+
+```json
+{
+  "id": 3,
+  "title": "Optional title",
+  "body": "Updated note content",
+  "tags": "work,updated",
+  "backgroundColor": "#B3E5FC",
+  "createdAt": "2026-05-03T15:30:00.000Z",
+  "updatedAt": "2026-05-03T16:30:00.000Z"
+}
+```
+
+### Error Responses
+- `400 Bad Request` when `body` is missing
+- `404 Not Found` when the note ID does not exist
+
+---
+
+## Delete Entry (DELETE)
+Delete a note by ID.
+
+### Request
 ```
 DELETE /api/entries/:id
 ```
 
-### 5. User Authentication (POST)
+### Response
+**Status**: `204 No Content`
+
+### Error Responses
+- `404 Not Found` when the note ID does not exist
+
+---
+
+## Future Endpoints (Planned)
+
+### User Authentication (POST)
 ```
 POST /api/auth/login
 POST /api/auth/register

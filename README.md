@@ -12,11 +12,14 @@ A simple and secure online journal application where users can write, edit, and 
 - ✅ **Responsive Design** - Works seamlessly on desktop and mobile devices
 - ✅ **Persistent Storage** - All notes stored securely in PostgreSQL
 
-### Optional Features (Planned)
+### Additional Features
+- ✅ Edit notes in place
+- ✅ Delete notes from the UI
+- ✅ Clear filter support for search and tags
+- ✅ Color selection for note backgrounds
 - User authentication for private access
 - Note categorization system
 - Offline availability with Service Workers
-- Edit and delete functionality
 
 ## Technology Stack
 
@@ -167,6 +170,8 @@ See [API.md](./API.md) for detailed endpoint documentation.
 ### Quick Reference
 - `GET /api/entries` - List all notes with optional search/filter
 - `POST /api/entries` - Create a new note
+- `PUT /api/entries/:id` - Update an existing note
+- `DELETE /api/entries/:id` - Delete a note
 
 ## Environment Configuration
 

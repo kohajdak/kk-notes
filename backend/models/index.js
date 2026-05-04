@@ -1,8 +1,8 @@
-// backend/models/index.js (ellenőrzés)
+// backend/models/index.js (check)
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
-const sequelize = require('../db'); // vagy a te db.js exportja
+const sequelize = require('../db');
 
 const db = {};
 fs.readdirSync(__dirname)

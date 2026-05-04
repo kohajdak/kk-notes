@@ -11,6 +11,8 @@ function App() {
   const [tagFilter, setTagFilter] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [formData, setFormData] = useState({ body: '', tags: '', backgroundColor: '#FFE082' })
+  const [editEntryId, setEditEntryId] = useState(null)
+  const [editData, setEditData] = useState({ body: '', tags: '', backgroundColor: '#FFE082' })
 
   const BACKGROUND_COLORS = [
     { name: 'Yellow', value: '#FFE082' },
@@ -70,6 +72,71 @@ function App() {
     }
   }
 
+  const handleClearFilters = () => {
+    setSearchQuery('')
+    setTagFilter('')
+  }
+
+  const startEditing = (entry) => {
+    setEditEntryId(entry.id)
+    setEditData({
+      body: entry.body,
+      tags: entry.tags || '',
+      backgroundColor: entry.backgroundColor || '#FFE082'
+    })
+  }
+
+  const cancelEdit = () => {
+    setEditEntryId(null)
+    setEditData({ body: '', tags: '', backgroundColor: '#FFE082' })
+  }
+
+  const handleEditSave = async (e) => {
+    e.preventDefault()
+    if (!editData.body.trim()) return
+
+    try {
+      const response = await fetch(`${API_BASE}/entries/${editEntryId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editData)
+      })
+
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}))
+        throw new Error(payload.error || 'Failed to update note')
+      }
+
+      const updatedEntry = await response.json()
+      setEntries(entries.map(entry => entry.id === updatedEntry.id ? updatedEntry : entry))
+      setEditEntryId(null)
+      setEditData({ body: '', tags: '', backgroundColor: '#FFE082' })
+      setError(null)
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this note?')) return
+
+    try {
+      const response = await fetch(`${API_BASE}/entries/${id}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        const payload = await response.text().catch(() => null)
+        throw new Error(payload || 'Failed to delete note')
+      }
+
+      setEntries(entries.filter(entry => entry.id !== id))
+      if (editEntryId === id) cancelEdit()
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -108,12 +175,30 @@ function App() {
               className="tag-input"
             />
           </div>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="new-note-btn"
-          >
-            {showForm ? 'Cancel' : '+ New Note'}
-          </button>
+          <div className="controls-actions">
+            {(searchQuery || tagFilter) && (
+              <button type="button" onClick={handleClearFilters} className="clear-btn">
+                Clear filters
+              </button>
+            )}
+            <button
+              onClick={() => setShowForm(!showForm)}
+              className="new-note-btn"
+            >
+              {showForm ? 'Cancel' : '+ New Note'}
+            </button>
+          </div>
+        </div>
+
+        <div className="entries-header">
+          <span className="note-count">{entries.length} note{entries.length !== 1 ? 's' : ''}</span>
+          {(searchQuery || tagFilter) && (
+            <span className="active-filters">
+              {searchQuery && <>Search: "{searchQuery}"</>}
+              {searchQuery && tagFilter && ' · '}
+              {tagFilter && <>Tag: "{tagFilter}"</>}
+            </span>
+          )}
         </div>
 
         {showForm && (
@@ -169,27 +254,85 @@ function App() {
                 <p>{searchQuery || tagFilter ? 'Try adjusting your search or filter.' : 'Create your first note to get started!'}</p>
               </div>
             ) : (
-              entries.map((entry) => (
-                <article key={entry.id} className="entry" style={{ backgroundColor: entry.backgroundColor }}>
-                  <header className="entry-header">
-                    <time className="entry-date">{formatDate(entry.createdAt)}</time>
-                  </header>
-                  <div className="entry-body">{entry.body}</div>
-                  {entry.tags && (
-                    <div className="entry-tags">
-                      {getTagsArray(entry.tags).map((tag, index) => (
-                        <span
-                          key={index}
-                          className="tag"
-                          onClick={() => setTagFilter(tag)}
-                        >
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </article>
-              ))
+              entries.map((entry) => {
+                const isEditing = editEntryId === entry.id
+                const updatedAtDifferent = entry.updatedAt && entry.updatedAt !== entry.createdAt
+                return (
+                  <article key={entry.id} className="entry" style={{ backgroundColor: entry.backgroundColor }}>
+                    <header className="entry-header">
+                      <div className="entry-meta">
+                        <time className="entry-date">Created {formatDate(entry.createdAt)}</time>
+                        {updatedAtDifferent && (
+                          <span className="entry-updated">Updated {formatDate(entry.updatedAt)}</span>
+                        )}
+                      </div>
+                      <div className="entry-actions">
+                        <button type="button" className="small-btn" onClick={() => startEditing(entry)}>
+                          Edit
+                        </button>
+                        <button type="button" className="small-btn delete-btn" onClick={() => handleDelete(entry.id)}>
+                          Delete
+                        </button>
+                      </div>
+                    </header>
+
+                    {isEditing ? (
+                      <form className="entry-edit-form" onSubmit={handleEditSave}>
+                        <textarea
+                          value={editData.body}
+                          onChange={(e) => setEditData({ ...editData, body: e.target.value })}
+                          className="form-textarea"
+                          rows="4"
+                          required
+                        />
+                        <input
+                          type="text"
+                          placeholder="Tags (comma-separated, optional)"
+                          value={editData.tags}
+                          onChange={(e) => setEditData({ ...editData, tags: e.target.value })}
+                          className="form-input"
+                        />
+                        <div className="color-picker">
+                          <label>Note Color:</label>
+                          <div className="color-options">
+                            {BACKGROUND_COLORS.map(color => (
+                              <button
+                                key={color.value}
+                                type="button"
+                                className={`color-option ${editData.backgroundColor === color.value ? 'active' : ''}`}
+                                style={{ backgroundColor: color.value }}
+                                onClick={() => setEditData({ ...editData, backgroundColor: color.value })}
+                                title={color.name}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <div className="edit-actions">
+                          <button type="submit" className="save-btn">Save</button>
+                          <button type="button" className="cancel-btn" onClick={cancelEdit}>Cancel</button>
+                        </div>
+                      </form>
+                    ) : (
+                      <>
+                        <div className="entry-body">{entry.body}</div>
+                        {entry.tags && (
+                          <div className="entry-tags">
+                            {getTagsArray(entry.tags).map((tag, index) => (
+                              <span
+                                key={index}
+                                className="tag"
+                                onClick={() => setTagFilter(tag)}
+                              >
+                                #{tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </article>
+                )
+              })
             )}
           </div>
         )}
