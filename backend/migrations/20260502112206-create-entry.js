@@ -11,13 +11,15 @@ module.exports = {
         type: _Sequelize.INTEGER
       },
       body: {
-        type: _Sequelize.TEXT
+        type: _Sequelize.TEXT,
+        allowNull: false
       },
       tags: {
         type: _Sequelize.STRING
       },
       backgroundColor: {
         type: _Sequelize.STRING,
+        allowNull: false,
         defaultValue: '#FFE082'
       },
       createdAt: {

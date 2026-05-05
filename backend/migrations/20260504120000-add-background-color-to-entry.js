@@ -3,13 +3,19 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.addColumn('Entries', 'backgroundColor', {
-      type: Sequelize.STRING,
-      defaultValue: '#FFE082',
-      allowNull: false
-    });
+    const table = await queryInterface.describeTable('Entries');
+    if (!table.backgroundColor) {
+      await queryInterface.addColumn('Entries', 'backgroundColor', {
+        type: Sequelize.STRING,
+        allowNull: false,
+        defaultValue: '#FFE082'
+      });
+    }
   },
-  async down(queryInterface, _Sequelize) {
-    await queryInterface.removeColumn('Entries', 'backgroundColor');
+  async down(queryInterface, Sequelize) {
+    const table = await queryInterface.describeTable('Entries');
+    if (table.backgroundColor) {
+      await queryInterface.removeColumn('Entries', 'backgroundColor');
+    }
   }
 };

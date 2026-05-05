@@ -6,20 +6,13 @@
 http://localhost:3000
 ```
 
-### Production
-```
-http://<your-domain>:3000
-```
-
 ## Overview
 
-The KK-Notes API provides endpoints for managing journal entries (notes). All requests and responses use JSON format.
+The KK-Notes API provides simple CRUD endpoints for managing notes. All requests and responses use JSON. This document describes the current, minimal implementation for a course assignment.
 
 ## Authentication
 
-Currently, **no authentication is required**. 
-
-**Future Implementation**: JWT tokens will be implemented for user-specific note management.
+Currently, **no authentication is required**.
 
 ## Content Type
 
@@ -48,7 +41,7 @@ Content-Type: application/json
 
 ### 1. List All Entries
 
-Retrieves all journal entries with optional search and filtering.
+Retrieves all notes with optional search and filtering.
 
 #### Request
 ```
@@ -92,17 +85,17 @@ curl 'http://localhost:3000/api/entries?q=meeting&tag=work'
 [
   {
     "id": 3,
-    "title": "Important Meeting",
     "body": "Discussed Q2 roadmap and timelines",
     "tags": "work,meeting",
+    "backgroundColor": "#B3E5FC",
     "createdAt": "2026-05-03T15:30:00.000Z",
     "updatedAt": "2026-05-03T15:30:00.000Z"
   },
   {
     "id": 2,
-    "title": "Personal Thoughts",
     "body": "Reflection on today's events",
     "tags": "personal",
+    "backgroundColor": "#FFE082",
     "createdAt": "2026-05-02T12:00:00.000Z",
     "updatedAt": "2026-05-02T12:00:00.000Z"
   }
@@ -119,7 +112,7 @@ curl 'http://localhost:3000/api/entries?q=meeting&tag=work'
 
 ### 2. Create Entry
 
-Creates a new journal entry.
+Creates a new note.
 
 #### Request
 ```
@@ -129,9 +122,9 @@ POST /api/entries
 #### Request Body
 ```json
 {
-  "title": "string (optional)",
   "body": "string (required)",
-  "tags": "string (optional, comma-separated)"
+  "tags": "string (optional, comma-separated)",
+  "backgroundColor": "string (optional, hex color)"
 }
 ```
 
@@ -139,8 +132,8 @@ POST /api/entries
 | Field | Type   | Required | Description |
 |-------|--------|----------|-------------|
 | `body` | string | Yes | Content of the note (required) |
-| `title` | string | No | Title/headline of the note |
 | `tags` | string | No | Comma-separated tags for categorization |
+| `backgroundColor` | string | No | Background color hex code for the note |
 
 #### Examples
 
@@ -158,9 +151,9 @@ curl -X POST http://localhost:3000/api/entries \
 curl -X POST http://localhost:3000/api/entries \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "Learning Log",
     "body": "Today I learned about REST APIs and how to document them",
-    "tags": "learning,api,rest"
+    "tags": "learning,api,rest",
+    "backgroundColor": "#FFE082"
   }'
 ```
 
@@ -172,9 +165,9 @@ curl -X POST http://localhost:3000/api/entries \
 ```json
 {
   "id": 4,
-  "title": "Learning Log",
   "body": "Today I learned about REST APIs and how to document them",
   "tags": "learning,api,rest",
+  "backgroundColor": "#FFE082",
   "createdAt": "2026-05-03T16:45:22.123Z",
   "updatedAt": "2026-05-03T16:45:22.123Z"
 }
@@ -200,7 +193,7 @@ curl -X POST http://localhost:3000/api/entries \
 ---
 
 ## Update Entry (PUT)
-Update an existing journal entry by ID.
+Update an existing note by ID.
 
 ### Request
 ```
@@ -222,7 +215,6 @@ PUT /api/entries/:id
 ```json
 {
   "id": 3,
-  "title": "Optional title",
   "body": "Updated note content",
   "tags": "work,updated",
   "backgroundColor": "#B3E5FC",
@@ -253,33 +245,6 @@ DELETE /api/entries/:id
 
 ---
 
-## Future Endpoints (Planned)
-
-### User Authentication (POST)
-```
-POST /api/auth/login
-POST /api/auth/register
-POST /api/auth/logout
-```
-
----
-
-## Rate Limiting
-
-Currently **not implemented**.
-
-**Future**: 100 requests per minute per IP address.
-
----
-
-## Pagination
-
-Currently **not implemented**.
-
-**Future**: Support for `limit` and `offset` query parameters.
-
----
-
 ## Testing Endpoints
 
 ### Using curl
@@ -290,7 +255,7 @@ curl http://localhost:3000/api/entries
 # Create entry
 curl -X POST http://localhost:3000/api/entries \
   -H "Content-Type: application/json" \
-  -d '{"body":"Test entry","title":"Test","tags":"test"}'
+  -d '{"body":"Test entry","tags":"test"}'
 ```
 
 ### Using Postman
@@ -310,9 +275,8 @@ fetch('/api/entries', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    title: 'My Note',
     body: 'Note content here',
-    tags: 'personal,journal'
+    tags: 'personal,note'
   })
 })
   .then(res => res.json())
@@ -330,23 +294,6 @@ Content-Type: application/json
 
 ---
 
-## Changelog
-
-### Version 1.0.0 (Current)
-- ✅ GET /api/entries with search & filter
-- ✅ POST /api/entries
-- ✅ Full test coverage
-- ✅ Docker deployment ready
-
-### Planned Features
-- User authentication
-- PUT/DELETE endpoints
-- Pagination
-- Advanced search filters
-- Rate limiting
-
----
-
 ## Support
 
 For issues or questions:
@@ -356,5 +303,4 @@ For issues or questions:
 
 ---
 
-**Last Updated**: May 3, 2026
-**API Version**: 1.0.0
+**Last Updated**: May 05, 2026

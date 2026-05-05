@@ -1,25 +1,22 @@
-# KK-Notes: Online Journal Application
+# KK-Notes: Online Note Application
 
-A simple and secure online journal application where users can write, edit, and manage private notes. Built with Express.js, PostgreSQL, and React.
+A simple online note application for creating, editing and managing private notes. Built with Express.js, PostgreSQL, and React.
 
 ## Features
 
 ### Core Features
-- ✅ **Create Notes** - Write and save personal journal entries
-- ✅ **List Notes** - View all notes in chronological order (newest first)
-- ✅ **Search Notes** - Find notes by content using full-text search
-- ✅ **Filter by Tags** - Organize and filter notes by custom tags
-- ✅ **Responsive Design** - Works seamlessly on desktop and mobile devices
-- ✅ **Persistent Storage** - All notes stored securely in PostgreSQL
+- **Create Notes** - Write and save personal notes
+- **List Notes** - View all notes in chronological order (newest first)
+- **Search Notes** - Find notes by content using full-text search
+- **Filter by Tags** - Filter notes by custom tags
+- **Responsive Design** - Works seamlessly on desktop and mobile devices
+- **Persistent Storage** - All notes stored securely in PostgreSQL
 
 ### Additional Features
-- ✅ Edit notes in place
-- ✅ Delete notes from the UI
-- ✅ Clear filter support for search and tags
-- ✅ Color selection for note backgrounds
-- User authentication for private access
-- Note categorization system
-- Offline availability with Service Workers
+- Edit notes in place
+- Delete notes from the UI
+- Clear filter support for search and tags
+- Color selection for note backgrounds
 
 ## Technology Stack
 
@@ -44,38 +41,33 @@ A simple and secure online journal application where users can write, edit, and 
 
 ```
 kk-notes/
-├── backend/                    # Express API server
-│   ├── config/                # Database configuration
-│   │   └── config.js         # Sequelize config for dev/test/prod
-│   ├── models/               # Sequelize models
-│   │   ├── entry.js          # Entry (Note) model
-│   │   └── index.js          # Model initialization
-│   ├── migrations/           # Database migrations
-│   │   └── 20260502112206-create-entry.js
-│   ├── tests/                # Test suites
-│   │   ├── entry.model.test.js
-│   │   ├── entries.test.js
-│   │   └── entries.integration.test.js
-│   ├── Dockerfile            # Backend container image
-│   ├── db.js                 # Database connection setup
-│   ├── index.js              # Express app & routes
-│   └── package.json
-├── frontend/                  # React application
-│   ├── src/
-│   │   ├── App.jsx           # Main app component
-│   │   ├── App.css
-│   │   ├── main.jsx
-│   │   └── index.css
-│   ├── public/               # Static assets
-│   ├── vite.config.js
-│   └── package.json
-├── db/                       # Database utilities
-│   └── schema.sql           # Initial schema (legacy)
-├── docker-compose.yml        # Multi-container orchestration
-├── .github/workflows/        # CI/CD pipelines
-│   └── backend-ci.yml       # Testing & deployment automation
-├── .env                      # Environment variables (not in git)
-└── README.md                 # This file
+├── .github/workflows/                    # CI/CD pipelines
+│   └── backend-ci.yml                    # Testing & deployment automation
+├── backend/                              # Express API server
+│   ├── config/                           # Database configuration
+│   │   └── config.js                     # Sequelize config for dev/
+│   ├── migrations/                       # Database migrations
+│   ├── models/                           # Sequelize models
+│   │   ├── entry.js                      # Entry (Note) model
+│   │   └── index.js                      # Model initialization
+│   ├── tests/                            # Test suites
+│   │   └── entries.integration.test.js   # Integration tests
+│   │   ├── entries.test.js               # Route tests
+│   │   ├── entry.model.test.js           # Unit tests
+│   ├── db.js                             # Database connection setup
+│   ├── Dockerfile                        # Backend container image
+│   ├── index.js                          # Express app & routes
+├── db/                                   # Database utilities
+│   └── schema.sql                        # Initial schema
+├── frontend/                             # React application
+│   ├── public/                           # Static assets
+│   ├── src/                              # Application source files
+│   │   ├── App.css                       # App component styles
+│   │   ├── App.jsx                       # Main app component
+│   │   ├── index.css                     # Global styles and CSS variables
+│   │   └── main.jsx                      # Entry point
+├── docker-compose.yml                    # Backend + database services
+└── README.md                             # This file
 ```
 
 ## Getting Started
@@ -94,18 +86,17 @@ kk-notes/
    ```
 
 2. **Set up environment variables**
+   Create a `.env` file in the project root to provide local values:
    ```bash
-   cp backend/.env .env  # or create with your values
-   ```
-   
-   Required variables:
-   ```
+   cat > .env <<EOF
    DB_USER=app
    DB_PASSWORD=secret
    DB_NAME=notes
    DB_HOST=db
    DB_PORT=5432
+   EOF
    ```
+
 
 3. **Start services**
    ```bash
@@ -119,7 +110,8 @@ kk-notes/
 
 5. **Access the application**
    - Backend API: http://localhost:3000
-   - Frontend: http://localhost:5173 (when built)
+
+> Note: `docker-compose.yml` starts only the backend and database. Start the frontend separately with Vite.
 
 ### Local Development Setup
 
@@ -183,7 +175,7 @@ See [API.md](./API.md) for detailed endpoint documentation.
 ### Production
 - Requires explicit migrations: `sequelize-cli db:migrate`
 - No auto-sync (safer for production)
-- Environment variables loaded from `.env`
+- Environment variables loaded from `.env` file if present
 
 ### Test
 - Separate test database (`notes_test`)
@@ -193,13 +185,13 @@ See [API.md](./API.md) for detailed endpoint documentation.
 ## CI/CD Pipeline
 
 GitHub Actions workflow runs on every push/PR:
-1. ✅ Install dependencies
-2. ✅ Lint code (ESLint)
-3. ✅ Spin up PostgreSQL service
-4. ✅ Run database migrations
-5. ✅ Run test suite with coverage
-6. ✅ Build Docker image
-7. ✅ Upload artifacts (coverage report + Docker image)
+1. Install dependencies
+2. Lint code (ESLint)
+3. Spin up PostgreSQL service
+4. Run database migrations
+5. Run test suite with coverage
+6. Build Docker image
+7. Upload artifacts (coverage report + Docker image)
 
 **Status**: Pipeline working ✅
 
@@ -228,17 +220,12 @@ CREATE TABLE Entries (
 ## Security
 
 ### Best Practices Implemented
-- ✅ Environment variables for sensitive data (.env in .gitignore)
-- ✅ No hardcoded secrets in source code
-- ✅ CORS considerations for multi-origin access
-- ✅ Input validation on API endpoints
-- ✅ SQL injection prevention via Sequelize ORM
+- Environment variables for sensitive data (`.env`)
+- No hardcoded secrets in source code
+- CORS considerations for multi-origin access
+- Input validation on API endpoints
+- SQL injection prevention via Sequelize ORM
 
-### Future Security Enhancements
-- User authentication & authorization
-- HTTPS/TLS in production
-- Rate limiting on API endpoints
-- Input sanitization
 
 ## Docker Commands
 
@@ -282,7 +269,7 @@ docker-compose exec backend sh
 
 ### Database Connection Issues
 - Verify `DATABASE_URL` environment variable is set
-- Check `.env` file exists in project root
+- Ensure required database env vars are available in root `.env` file
 - Ensure PostgreSQL container is healthy: `docker-compose ps`
 
 ### Migration Failures
@@ -299,31 +286,10 @@ docker-compose exec backend sh
 - Change ports in `docker-compose.yml`
 - Or stop conflicting services: `docker ps` then `docker stop <container>`
 
-## Performance
-
-- **Startup Time**: ~6 seconds (with container health checks)
-- **Test Suite**: ~1.5 seconds
-- **API Response**: <100ms (typical)
-- **Database Queries**: Indexed on primary key
-
-## Contributing
-
-- Follow ESLint rules: `npm run lint`
-- Write tests for new features
-- Update documentation for API changes
-- Use meaningful commit messages
-- Create feature branches from `main`
-
-## License
-
-ISC
-
 ## Author
 
 Created for educational purposes as a fullstack JavaScript application showcase.
 
 ---
 
-**Last Updated**: May 3, 2026
-**Node Version**: 20.20.2
-**Database**: PostgreSQL 15
+**Last Updated**: May 05, 2026

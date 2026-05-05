@@ -12,7 +12,7 @@ export default defineConfig([
     plugins: { js },
     extends: ["js/recommended"],
     rules: {
-      "no-unused-vars": ['warn', { argsIgnorePattern: '^_' }],
+      "no-unused-vars": "warn",
       "no-undef": "warn"
     }
   },
