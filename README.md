@@ -209,9 +209,9 @@ GitHub Actions workflow runs on every push/PR:
 ```sql
 CREATE TABLE Entries (
   id SERIAL PRIMARY KEY,
-  title VARCHAR,
   body TEXT NOT NULL,
   tags VARCHAR,
+  backgroundColor VARCHAR DEFAULT '#FFE082',
   createdAt TIMESTAMP,
   updatedAt TIMESTAMP
 );
@@ -219,9 +219,9 @@ CREATE TABLE Entries (
 
 ### Model Fields
 - `id` - Auto-incrementing primary key
-- `title` - Optional note title (string)
 - `body` - Note content (required, text)
 - `tags` - Comma-separated tags (optional)
+- `backgroundColor` - Hex color code for note background (default: '#FFE082')
 - `createdAt` - Timestamp (auto-managed)
 - `updatedAt` - Timestamp (auto-managed)
 

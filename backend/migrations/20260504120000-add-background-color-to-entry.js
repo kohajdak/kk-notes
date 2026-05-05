@@ -1,3 +1,4 @@
+// backend/migrations/20260504120000-add-background-color-to-entry.js
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -8,7 +9,7 @@ module.exports = {
       allowNull: false
     });
   },
-  async down(queryInterface, Sequelize) {
+  async down(queryInterface, _Sequelize) {
     await queryInterface.removeColumn('Entries', 'backgroundColor');
   }
 };

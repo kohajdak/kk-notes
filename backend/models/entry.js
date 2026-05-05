@@ -4,7 +4,7 @@ const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class Entry extends Model {
-    static associate(models) {
+    static associate() {
     }
   }
 
@@ -13,10 +13,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true
-    },
-    title: {
-      type: DataTypes.STRING,
-      allowNull: true
     },
     body: {
       type: DataTypes.TEXT,

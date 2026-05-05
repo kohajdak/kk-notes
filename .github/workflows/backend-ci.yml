@@ -1,3 +1,4 @@
+# .github/workflows/backend-ci.yml
 name: Backend CI and Deploy
 
 on:
@@ -7,29 +8,36 @@ on:
     branches: [ main, master ]
   workflow_dispatch: {}
 
+env:
+  NODE_ENV: test
+  TEST_DB_USERNAME: ${{ secrets.TEST_DB_USERNAME }}
+  TEST_DB_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+  TEST_DB_DBNAME: ${{ secrets.TEST_DB_DBNAME }}
+
 jobs:
   test-and-migrate:
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
     services:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_USER: app
-          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
-          POSTGRES_DB: notes_test
+          POSTGRES_USER: ${{ env.TEST_DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ env.TEST_DB_PASSWORD }}
+          POSTGRES_DB: ${{ env.TEST_DB_DBNAME }}
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U app -d notes_test"
+          --health-cmd "pg_isready -q -h localhost -p 5432"
           --health-interval 10s --health-timeout 5s --health-retries 5
-
-    env:
-      NODE_ENV: test
-      DATABASE_URL: postgres://app:${{ secrets.TEST_DB_PASSWORD }}@postgres:5432/notes_test
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set DATABASE_URL
+        run: echo "DATABASE_URL=postgres://${{ env.TEST_DB_USERNAME }}:${{ env.TEST_DB_PASSWORD }}@localhost:5432/${{ env.TEST_DB_DBNAME }}" >> $GITHUB_ENV
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -50,8 +58,9 @@ jobs:
 
       - name: Wait for Postgres
         run: |
+          export PGPASSWORD="${{ secrets.TEST_DB_PASSWORD }}"
           for i in {1..60}; do
-            if pg_isready -h localhost -p 5432 -U app; then
+            if pg_isready -h localhost -p 5432 -U ${{ env.TEST_DB_USERNAME }} -d ${{ env.TEST_DB_DBNAME }}; then
               echo "Postgres is ready!"
               exit 0
             fi
@@ -64,15 +73,15 @@ jobs:
       - name: Run migrations
         working-directory: backend
         env:
-          DATABASE_URL: postgres://app:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/notes_test
-          PGPASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          PGPASSWORD: ${{ env.TEST_DB_PASSWORD }}
         run: npx sequelize-cli db:migrate --env test --url "$DATABASE_URL"
 
       - name: Run tests with coverage
         working-directory: backend
         env:
-          DATABASE_URL: postgres://app:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/notes_test
-          PGPASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          PGPASSWORD: ${{ env.TEST_DB_PASSWORD }}
         run: npm test -- --coverage
 
       - name: Upload coverage report

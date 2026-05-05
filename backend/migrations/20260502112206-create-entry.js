@@ -1,34 +1,36 @@
+// backend/migrations/20260502112206-create-entry.js
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  async up(queryInterface, _Sequelize) {
     await queryInterface.createTable('Entries', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      title: {
-        type: Sequelize.STRING
+        type: _Sequelize.INTEGER
       },
       body: {
-        type: Sequelize.TEXT
+        type: _Sequelize.TEXT
       },
       tags: {
-        type: Sequelize.STRING
+        type: _Sequelize.STRING
+      },
+      backgroundColor: {
+        type: _Sequelize.STRING,
+        defaultValue: '#FFE082'
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: _Sequelize.DATE
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: _Sequelize.DATE
       }
     });
   },
-  async down(queryInterface, Sequelize) {
+  async down(queryInterface, _Sequelize) {
     await queryInterface.dropTable('Entries');
   }
 };

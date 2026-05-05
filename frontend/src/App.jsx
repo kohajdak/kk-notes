@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import './App.css'
 
 const API_BASE = 'http://localhost:3000/api'
@@ -23,32 +23,47 @@ function App() {
     { name: 'Gray', value: '#ECEFF1' }
   ]
 
-  // Fetch entries on component mount and when filters change
-  useEffect(() => {
-    fetchEntries()
-  }, [searchQuery, tagFilter])
-
-  const fetchEntries = async () => {
+  // Memoized fetch function with optional signal parameter
+  const fetchEntries = useCallback(async (signal) => {
     try {
       setLoading(true)
+
       const params = new URLSearchParams()
       if (searchQuery) params.append('q', searchQuery)
       if (tagFilter) params.append('tag', tagFilter)
 
-      const response = await fetch(`${API_BASE}/entries?${params}`)
+      const url = `${API_BASE}/entries?${params.toString()}`
+      const response = await fetch(url, { signal })
+
       if (!response.ok) {
         const errorPayload = await response.json().catch(() => ({}))
         throw new Error(errorPayload.error || 'Failed to fetch entries')
       }
+
       const data = await response.json()
       setEntries(data)
       setError(null)
     } catch (err) {
-      setError(err.message)
+      if (err.name === 'AbortError') {
+        return
+      }
+      setError(err.message || 'Unknown error')
     } finally {
       setLoading(false)
     }
-  }
+  }, [searchQuery, tagFilter])
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    (async () => {
+      await fetchEntries(controller.signal);
+    })()
+
+    return () => {
+      controller.abort();
+    }
+  }, [fetchEntries]);
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -240,7 +255,14 @@ function App() {
         {error && (
           <div className="error-message">
             Error: {error}
-            <button onClick={fetchEntries} className="retry-btn">Retry</button>
+            <button
+              onClick={() => {
+                fetchEntries()
+              }}
+              className="retry-btn"
+            >
+              Retry
+            </button>
           </div>
         )}
 

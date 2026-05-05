@@ -5,6 +5,3 @@ dist/
 .vscode/
 coverage/
 db-data/
-README.md
-API.md
-backend/backend-image.tar

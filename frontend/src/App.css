@@ -388,7 +388,6 @@ body {
   transition: box-shadow 0.2s, transform 0.1s;
   color: var(--entry-text, #1e293b);
   forced-color-adjust: none;
-  color-adjust: exact;
 }
 
 .entry:hover {
