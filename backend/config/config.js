@@ -1,4 +1,5 @@
 // backend/config/config.js
+require('dotenv').config();
 const buildUrl = ({ host, port, user, pass, name }) =>
   `postgres://${encodeURIComponent(user)}:${encodeURIComponent(pass)}@${host}:${port}/${name}`;
 

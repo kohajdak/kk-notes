@@ -1,22 +1,21 @@
-# KK-Notes: Online Note Application
+# KK-Notes: The Note Application
 
-A simple online note application for creating, editing and managing private notes. Built with Express.js, PostgreSQL, and React.
+A simple note application for creating, editing and managing private notes. Built with Express.js, PostgreSQL, and React.
 
 ## Features
 
 ### Core Features
 - **Create Notes** - Write and save personal notes
-- **List Notes** - View all notes in chronological order (newest first)
+- **Edit Notes** - Update existing notes in place
+- **Delete Notes** - Remove notes from the application
 - **Search Notes** - Find notes by content using full-text search
-- **Filter by Tags** - Filter notes by custom tags
-- **Responsive Design** - Works seamlessly on desktop and mobile devices
-- **Persistent Storage** - All notes stored securely in PostgreSQL
 
 ### Additional Features
-- Edit notes in place
-- Delete notes from the UI
-- Clear filter support for search and tags
+- Filter notes by custom tags
+- Clear search and tag filters
 - Color selection for note backgrounds
+- Responsive design on desktop and mobile
+- Notes stored securely in PostgreSQL
 
 ## Technology Stack
 
@@ -74,7 +73,7 @@ kk-notes/
 
 ### Prerequisites
 - Docker & Docker Compose
-- Node.js 20+ (for local development)
+- Node.js 20+ (for frontend and local development)
 - PostgreSQL 15+ (if running without Docker)
 
 ### Quick Start with Docker
@@ -92,26 +91,39 @@ kk-notes/
    DB_USER=app
    DB_PASSWORD=secret
    DB_NAME=notes
+   DB_NAME_TEST=notes_test
    DB_HOST=db
    DB_PORT=5432
    EOF
    ```
 
-
-3. **Start services**
+3. **Start backend services**
    ```bash
    docker-compose up -d --build
    ```
 
-4. **Run migrations**
+4. **Install backend dependencies**
+   ```bash
+   docker-compose exec backend npm ci
+   ```
+
+5. **Run migrations**
    ```bash
    docker-compose exec backend npx sequelize-cli db:migrate
    ```
 
-5. **Access the application**
+6. **Start the frontend**
+   ```bash
+   cd frontend
+   npm ci
+   npm run dev  # Starts Vite dev server on http://localhost:5173
+   ```
+
+7. **Access the application**
+   - Frontend: http://localhost:5173
    - Backend API: http://localhost:3000
 
-> Note: `docker-compose.yml` starts only the backend and database. Start the frontend separately with Vite.
+> Note: `docker-compose.yml` starts only the backend and database. The frontend requires Node.js and must be started separately.
 
 ### Local Development Setup
 
@@ -138,17 +150,17 @@ kk-notes/
 
 ## Testing
 
-### Run All Tests
+### Run All Tests with Docker
+```bash
+cd backend
+docker-compose exec backend npm test -- --coverage
+```
+
+### Run All Tests locally
 ```bash
 cd backend
 npm test -- --coverage
 ```
-
-### Test Coverage
-- **Line Coverage**: 77.58%
-- **Branch Coverage**: 38.23%
-- **Function Coverage**: 70%
-- **3 test suites**: All passing ✅
 
 ### Test Types
 - **Unit Tests**: `entry.model.test.js` - Model validation
@@ -292,4 +304,4 @@ Created for educational purposes as a fullstack JavaScript application showcase.
 
 ---
 
-**Last Updated**: May 05, 2026
+**Last Updated**: May 06, 2026
