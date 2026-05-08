@@ -97,6 +97,10 @@ kk-notes/
    EOF
    ```
 
+> Note: Do not include special characters in the secret. Use only alphanumeric characters. (A–Z, a–z, 0–9)
+
+> Technical note: Some shells, connection strings, or libraries may interpret special characters and break parsing of environment variables or PostgreSQL connection URIs. Unescaped characters such as `$`, `@`, `:`, `/`, `"` or `'` can be interpreted by the shell or the URI parser and cause the backend to fail to start. To avoid startup failures, keep the secret limited to safe characters or URL‑encode/escape it before use.
+
 3. **Start backend services**
    ```bash
    docker-compose up -d --build
@@ -149,6 +153,8 @@ kk-notes/
    ```
 
 ## Testing
+
+> Note: The test suite resets the database (calls sequelize.sync({ force: true })) and will delete existing rows. Run tests only against an empty test database or back up your data before running tests.
 
 ### Run All Tests with Docker
 ```bash
