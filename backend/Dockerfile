@@ -1,13 +1,13 @@
 # backend/Dockerfile
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --omit=dev --no-fund
 COPY . .
 
-FROM node:20-alpine AS runtime
+FROM node:24-alpine AS runtime
 WORKDIR /app
 COPY --from=builder /app ./
 ENV NODE_ENV=production
-RUN npm ci --production
+RUN npm ci --omit=dev --no-fund
 CMD ["node", "index.js"]

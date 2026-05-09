@@ -20,15 +20,15 @@ A simple note application for creating, editing and managing private notes. Buil
 ## Technology Stack
 
 ### Backend
-- **Runtime**: Node.js 20
-- **Framework**: Express.js 5.x
-- **ORM**: Sequelize 6.x (PostgreSQL)
+- **Runtime**: Node.js 24.15.0 (LTS)
+- **Framework**: Express.js 5.2.1
+- **ORM**: Sequelize 6.37.8 (PostgreSQL)
 - **Testing**: Jest with Supertest
 - **Linting**: ESLint
 
 ### Frontend
-- **Framework**: React 19.x
-- **Build Tool**: Vite 8.x
+- **Framework**: React 19.2.5
+- **Build Tool**: Vite 8.0.10
 - **Styling**: CSS3
 
 ### Infrastructure
@@ -55,6 +55,7 @@ kk-notes/
 │   │   ├── entry.model.test.js           # Unit tests
 │   ├── db.js                             # Database connection setup
 │   ├── Dockerfile                        # Backend container image
+│   ├── eslint.config.mjs                 # ESLint config for backend
 │   ├── index.js                          # Express app & routes
 ├── db/                                   # Database utilities
 │   └── schema.sql                        # Initial schema
@@ -65,6 +66,10 @@ kk-notes/
 │   │   ├── App.jsx                       # Main app component
 │   │   ├── index.css                     # Global styles and CSS variables
 │   │   └── main.jsx                      # Entry point
+│   ├── eslint.config.js                  # ESLint config for frontend
+│   ├── README.md                         # React + Vite template documentation
+│   └── vite.config.js                    # React integration file
+├── API.md                                # API documentation
 ├── docker-compose.yml                    # Backend + database services
 └── README.md                             # This file
 ```
@@ -73,7 +78,7 @@ kk-notes/
 
 ### Prerequisites
 - Docker & Docker Compose
-- Node.js 20+ (for frontend and local development)
+- Node.js 24+ (for frontend and local development)
 - PostgreSQL 15+ (if running without Docker)
 
 ### Quick Start with Docker
@@ -97,9 +102,7 @@ kk-notes/
    EOF
    ```
 
-> Note: Do not include special characters in the secret. Use only alphanumeric characters. (A–Z, a–z, 0–9)
-
-> Technical note: Some shells, connection strings, or libraries may interpret special characters and break parsing of environment variables or PostgreSQL connection URIs. Unescaped characters such as `$`, `@`, `:`, `/`, `"` or `'` can be interpreted by the shell or the URI parser and cause the backend to fail to start. To avoid startup failures, keep the secret limited to safe characters or URL‑encode/escape it before use.
+> Note: A valid variable name must contain only letters (uppercase or lowercase), digits and underscores (_) and it can't begin with a digit. Check https://nodejs.org/dist/v24.15.0/docs/api/environment_variables.html for more information.
 
 3. **Start backend services**
    ```bash
@@ -310,4 +313,4 @@ Created for educational purposes as a fullstack JavaScript application showcase.
 
 ---
 
-**Last Updated**: May 06, 2026
+**Last Updated**: May 10, 2026
