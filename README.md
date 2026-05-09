@@ -50,13 +50,14 @@ kk-notes/
 │   │   ├── entry.js                      # Entry (Note) model
 │   │   └── index.js                      # Model initialization
 │   ├── tests/                            # Test suites
-│   │   └── entries.integration.test.js   # Integration tests
+│   │   ├── entries.integration.test.js   # Integration tests
 │   │   ├── entries.test.js               # Route tests
-│   │   ├── entry.model.test.js           # Unit tests
+│   │   └── entry.model.test.js           # Unit tests
 │   ├── db.js                             # Database connection setup
 │   ├── Dockerfile                        # Backend container image
 │   ├── eslint.config.mjs                 # ESLint config for backend
 │   ├── index.js                          # Express app & routes
+│   └── jest.config.cjs                   # Jest configuration
 ├── db/                                   # Database utilities
 │   └── schema.sql                        # Initial schema
 ├── frontend/                             # React application
