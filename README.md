@@ -103,7 +103,11 @@ kk-notes/
    EOF
    ```
 
-> Note: A valid variable name must contain only letters (uppercase or lowercase), digits and underscores (_) and it can't begin with a digit. Check https://nodejs.org/dist/v24.15.0/docs/api/environment_variables.html for more information.
+> Note for variables: A valid variable name must contain only letters (uppercase or lowercase), digits and underscores (_) and it can't begin with a digit. Check https://nodejs.org/dist/v24.15.0/docs/api/environment_variables.html for more information.
+
+> Note for secret value: Do not include special characters in the secret. Use only alphanumeric characters. (A–Z, a–z, 0–9)
+
+> Technical note for secret value: Some shells, connection strings, or libraries may interpret special characters and break parsing of environment variables or PostgreSQL connection URIs. Unescaped characters such as `$`, `@`, `:`, `/`, `"` or `'` can be interpreted by the shell or the URI parser and cause the backend to fail to start. To avoid startup failures, keep the secret limited to safe characters or URL‑encode/escape it before use.
 
 3. **Start backend services**
    ```bash
